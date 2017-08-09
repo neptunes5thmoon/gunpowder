@@ -125,10 +125,20 @@ class DvidSource(BatchProvider):
     def __get_roi(self, array_name):
         data_instance = dvision.DVIDDataInstance(self.hostname, self.port, self.uuid, array_name)
         info = data_instance.info
-        roi_min = info['Extended']['MinPoint']
+        print(info['Extended'])
+        print(info['Base'])
+        try:
+            roi_min = info['Extended']['MinPoint']
+        except KeyError:
+            roi_min = np.array([0, 0, info['Extended']['MinZ']])*np.array(info['Extended']['BlockSize'])
+
         if roi_min is not None:
             roi_min = Coordinate(roi_min[::-1])
-        roi_max = info['Extended']['MaxPoint']
+        try:
+            roi_max = info['Extended']['MaxPoint']
+        except KeyError:
+            roi_max = np.array([1000, 1000, info['Extended']['MaxZ']])*np.array(info['Extended']['BlockSize'])
+
         if roi_max is not None:
             roi_max = Coordinate(roi_max[::-1])
 
