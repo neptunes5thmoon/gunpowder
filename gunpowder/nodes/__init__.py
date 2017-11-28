@@ -6,6 +6,7 @@ from .add_gt_affinities import AddGtAffinities
 from .add_gt_mask_exclusive_zone import AddGtMaskExclusiveZone
 from .add_vector_map import AddVectorMap
 from .balance_labels import BalanceLabels
+from .balance_by_threshold import BalanceByThreshold
 from .batch_filter import BatchFilter
 from .batch_provider import BatchProvider
 from .crop import Crop
