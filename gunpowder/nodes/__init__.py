@@ -13,6 +13,7 @@ from .downsample import DownSample
 from .dvid_source import DvidSource
 from .elastic_augment import ElasticAugment
 from .exclude_labels import ExcludeLabels
+from .fill import Fill
 from .grow_boundary import GrowBoundary
 from .hdf5_source import Hdf5Source
 from .hdf5_write import Hdf5Write
@@ -28,6 +29,7 @@ from .random_location import RandomLocation
 from .random_provider import RandomProvider
 from .rasterize_points import RasterizePoints
 from .reject import Reject
+from .reject_to_fill import RejectToFill
 from .scan import Scan
 from .simple_augment import SimpleAugment
 from .snapshot import Snapshot
