@@ -13,11 +13,14 @@ echo "Starting as user ${USER_ID} with home ${HOME}"
 
 nvidia-docker pull ${CONTAINER}
 
-NV_GPU=1 nvidia-docker run --rm \
+NV_GPU=0 nvidia-docker run --rm \
     -u ${USER_ID} \
     -e HOME=${USER_HOME} \
     -v ${PWD}:/run \
+    -v ${PWD}/../..:/custom \
     -w /run \
     --name ${NAME} \
     ${CONTAINER} \
-    python -u train.py 400000 0
+    /bin/bash -c "export PYTHONPATH=/custom:/src/malis:/src/waterz:/src/dvision:/src/augment:/src/caffe/python:/src
+    /caffe/python/caffe
+    :$PYTHONPATH; python -u train.py 40000 0"
