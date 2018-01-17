@@ -2,9 +2,11 @@ from __future__ import print_function
 import sys
 from gunpowder import *
 from gunpowder.caffe import *
+from gunpowder.contrib import PrepareMalis
 import malis
 import glob
 import math
+import numpy as np
 
 # the training HDF files
 samples = [
@@ -29,7 +31,7 @@ def train_until(max_iteration, gpu):
         trained_until = 0
         print("Starting fresh training")
 
-    if trained_until < phase_switch and max_iteration > phase_switch:
+    if trained_until < phase_switch < max_iteration:
         # phase switch lies in-between, split training into to parts
         train_until(phase_switch, gpu)
         trained_until = phase_switch
@@ -62,17 +64,33 @@ def train_until(max_iteration, gpu):
 
     # input and output shapes of the network, needed to formulate matching batch 
     # requests
-    input_shape = (196,)*3
-    output_shape = (92,)*3
+    voxel_size = Coordinate((8,)*3)
+    input_shape = Coordinate((196,)*3)*voxel_size
+    output_shape = Coordinate((92,)*3)*voxel_size
+
+    # register array keys
+    ArrayKey('RAW')
+    ArrayKey('ALPHA_MASK')
+    ArrayKey('GT_LABELS')
+    ArrayKey('GT_MASK')
+    ArrayKey('PRED_AFFINITIES')
+    ArrayKey('GT_AFFINITIES')
+    ArrayKey('GT_AFFINITIES_MASK')
+    ArrayKey('GT_AFFINITIES_SCALE')
+    ArrayKey('LOSS_GRADIENT')
+    ArrayKey('MALIS_COMP_LABEL')
 
     # arrays to request for each batch
     request = BatchRequest()
-    request.add_array_request(ArrayKeys.RAW, input_shape)
-    request.add_array_request(ArrayKeys.GT_LABELS, output_shape)
-    request.add_array_request(ArrayKeys.GT_MASK, output_shape)
-    request.add_array_request(ArrayKeys.GT_AFFINITIES, output_shape)
+    request.add(ArrayKeys.RAW, input_shape)
+    request.add(ArrayKeys.GT_LABELS, output_shape)
+    request.add(ArrayKeys.GT_MASK, output_shape)
+    request.add(ArrayKeys.GT_AFFINITIES, output_shape)
+    request.add(ArrayKeys.GT_AFFINITIES_MASK, output_shape)
+    request.add(ArrayKeys.MALIS_COMP_LABEL, output_shape)
+
     if phase == 'euclid':
-        request.add_array_request(ArrayKeys.LOSS_SCALE, output_shape)
+        request.add(ArrayKeys.GT_AFFINITIES_SCALE, output_shape)
 
     # create a tuple of data sources, one for each HDF file
     data_sources = tuple(
@@ -84,18 +102,22 @@ def train_until(max_iteration, gpu):
                 ArrayKeys.RAW: 'volumes/raw',
                 ArrayKeys.GT_LABELS: 'volumes/labels/neuron_ids',
                 ArrayKeys.GT_MASK: 'volumes/labels/mask',
+            },
+            array_specs={
+                ArrayKeys.GT_MASK: ArraySpec(interpolatable=False)
             }
         ) +
 
         # ensure RAW is in float in [0,1]
-        Normalize() +
+        Normalize(ArrayKeys.RAW) +
 
         # zero-pad provided RAW and GT_MASK to be able to draw batches close to 
         # the boundary of the available data
         Pad(
             {
-                ArrayKeys.RAW: Coordinate((100, 100, 100)),
-                ArrayKeys.GT_MASK: Coordinate((100, 100, 100))
+                ArrayKeys.RAW: Coordinate((100, 100, 100))*voxel_size,
+                ArrayKeys.GT_LABELS: Coordinate((100, 100, 100))*voxel_size,
+                ArrayKeys.GT_MASK: Coordinate((100, 100, 100)*voxel_size)
             }
         ) +
 
@@ -103,7 +125,7 @@ def train_until(max_iteration, gpu):
         RandomLocation() +
 
         # reject batches wich do contain less than 50% labelled data
-        Reject()
+        Reject(ArrayKeys.GT_MASK)
 
         for sample in samples
     )
@@ -123,23 +145,34 @@ def train_until(max_iteration, gpu):
         SimpleAugment() +
 
         # grow a 0-boundary between labelled objects
-        GrowBoundary(steps=4) +
+        GrowBoundary(ArrayKeys.GT_LABELS, ArrayKeys.GT_MASK, steps=4) +
 
         # relabel connected label components inside the batch
-        SplitAndRenumberSegmentationLabels() +
+        SplitAndRenumberSegmentationLabels(ArrayKeys.GT_LABELS) +
 
         # compute ground-truth affinities from labels
-        AddGtAffinities(malis.mknhood3d()) +
+        AddGtAffinities([[-1,0,0], [0, -1, 0], [0, 0, -1]],
+                        gt_labels=ArrayKeys.GT_LABELS,
+                        gt_affinities=ArrayKeys.GT_AFFINITIES,
+                        gt_labels_mask=ArrayKeys.GT_MASK,
+                        gt_affinities_mask=ArrayKeys.GT_AFFINITIES_MASK) +
+        PrepareMalis(
+            labels_array_key=ArrayKeys.GT_LABELS,
+            malis_comp_array_key=ArrayKeys.MALIS_COMP_LABEL
+        ) +
 
-        # add a LOSS_SCALE array to balance positive and negative classes for 
+        # add a GT_AFFINITIES_SCALE array to balance positive and negative classes for
         # Euclidean training
-        BalanceAffinityLabels() +
+        BalanceLabels(ArrayKeys.GT_AFFINITIES,
+                      ArrayKeys.GT_AFFINITIES_SCALE,
+                      ArrayKeys.GT_AFFINITIES_MASK) +
 
         # randomly scale and shift intensities
-        IntensityAugment(0.9, 1.1, -0.1, 0.1) +
+        IntensityAugment(ArrayKeys.RAW, 0.9, 1.1, -0.1, 0.1) +
 
         # ensure RAW is in [-1,1]
-        IntensityScaleShift(2,-1) +
+        IntensityScaleShift(ArrayKeys.RAW, 2,-1) +
+        ZeroOutConstSections(ArrayKeys.RAW) +
 
         # use 10 workers to pre-cache batches of the above pipeline
         PreCache(
@@ -150,24 +183,30 @@ def train_until(max_iteration, gpu):
         Train(
             solver_parameters,
             inputs={
-                ArrayKeys.RAW: 'data',
-                ArrayKeys.GT_AFFINITIES: 'aff_label',
+                'data': ArrayKeys.RAW,
+                'aff_label': ArrayKeys.GT_AFFINITIES,
             },
             outputs={
-                ArrayKeys.PRED_AFFINITIES: 'aff_pred'
+                'aff_pred': ArrayKeys.PRED_AFFINITIES
             },
             gradients={
-                ArrayKeys.LOSS_GRADIENT: 'aff_pred'
-            },
-            resolutions={
-                ArrayKeys.PRED_AFFINITIES: Coordinate((8,8,8)),
-                ArrayKeys.LOSS_GRADIENT: Coordinate((8,8,8)),
+                'aff_pred': ArrayKeys.LOSS_GRADIENT
             },
             use_gpu=gpu) +
 
         # save every 100th batch into an HDF5 file for manual inspection
-        Snapshot(
+        Snapshot({
+            ArrayKeys.RAW: 'volumes/raw',
+            ArrayKeys.GT_LABELS: 'volumes/labels/neuron_ids',
+            ArrayKeys.GT_AFFINITIES: 'volumes/labels/gt_affinities',
+            ArrayKeys.PRED_AFFINITIES: 'volumes/labels/pred_affinities',
+            ArrayKeys.LOSS_GRADIENT: '/volumes/loss_gradient'
+            },
+            dataset_dtypes={
+                ArrayKeys.GT_LABELS: np.uint64
+            },
             every=100,
+            output_dir='snapshots',
             output_filename='batch_{iteration}.hdf',
             additional_request=BatchRequest({ArrayKeys.LOSS_GRADIENT: request.arrays[ArrayKeys.GT_AFFINITIES]})) +
 

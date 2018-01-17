@@ -15,5 +15,5 @@ NV_GPU=1 nvidia-docker run --rm \
     -v ${PWD}:/run \
     -w /run \
     --name ${NAME} \
-    funkey/gunpowder:v0.2 \
+    funkey/gunpowder:v0.3-pre5 \
     python -u process.py 0
