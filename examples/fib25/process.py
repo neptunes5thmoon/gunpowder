@@ -1,6 +1,7 @@
 import sys
 import os
 
+import glob
 import copy
 import numpy as np
 
@@ -21,10 +22,14 @@ def predict_affinities(gpu):
     # the network architecture
     prototxt = 'net.prototxt'
 
-    # the learned weights (example at iteration 90000)
-    iteration=90000
-    weights  = 'net_iter_%d.caffemodel' %iteration
-
+    # the learned weights (last iteration)
+    solverstates = [int(f.split('.')[0].split('_')[-1]) for f in glob.glob('net_iter_*.solverstate')]
+    if len(solverstates) > 0:
+        iteration = max(solverstates)
+    else:
+        raise IOError("found no checkpoint for caffe model")
+    # if you want a specific iteration put "iteration=" here
+    weights = 'net_iter_%d.caffemodel' % iteration
     # where to write output
     h5_targetfile='./processed_trvol-250-1_%d.hdf' %iteration
 
