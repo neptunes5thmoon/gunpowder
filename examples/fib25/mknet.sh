@@ -21,6 +21,5 @@ NV_GPU=0 nvidia-docker run --rm \
     -w /run \
     --name ${NAME} \
     ${CONTAINER} \
-    /bin/bash -c "export PYTHON_EGG_CACHE=/run; export PYTHONPATH=/custom:/src/malis:/src/waterz:/src/dvision:/src/augment:/src/caffe/python:/src
-    /caffe/python/caffe
-    :$PYTHONPATH; python -u mknet.py"
+    /bin/bash -c 'export PYTHON_EGG_CACHE=/run; export PYTHONPATH="/custom:$PYTHONPATH"; python -u mknet.py tf'
+

@@ -1,0 +1,1 @@
+{"loss": "mean_squared_error/value:0", "optimizer": "Adam", "affs": "Reshape_1:0", "summary": "Merge/MergeSummary:0", "raw": "Placeholder:0", "gt_affs": "Placeholder_1:0", "affs_loss_weights": "Placeholder_2:0"}

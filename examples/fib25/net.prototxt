@@ -79,10 +79,10 @@ layer {
   bottom: "data"
   top: "Convolution1"
   param {
-    lr_mult: 1.0
+    lr_mult: 1
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 2
   }
   convolution_param {
     num_output: 12
@@ -105,7 +105,7 @@ layer {
   bottom: "Convolution1"
   top: "Convolution1"
   relu_param {
-    negative_slope: 0.00499999988824
+    negative_slope: 0.005
   }
 }
 layer {
@@ -114,10 +114,10 @@ layer {
   bottom: "Convolution1"
   top: "Convolution2"
   param {
-    lr_mult: 1.0
+    lr_mult: 1
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 2
   }
   convolution_param {
     num_output: 12
@@ -140,7 +140,7 @@ layer {
   bottom: "Convolution2"
   top: "Convolution2"
   relu_param {
-    negative_slope: 0.00499999988824
+    negative_slope: 0.005
   }
 }
 layer {
@@ -166,10 +166,10 @@ layer {
   bottom: "Pooling1"
   top: "Convolution3"
   param {
-    lr_mult: 1.0
+    lr_mult: 1
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 2
   }
   convolution_param {
     num_output: 60
@@ -192,7 +192,7 @@ layer {
   bottom: "Convolution3"
   top: "Convolution3"
   relu_param {
-    negative_slope: 0.00499999988824
+    negative_slope: 0.005
   }
 }
 layer {
@@ -201,10 +201,10 @@ layer {
   bottom: "Convolution3"
   top: "Convolution4"
   param {
-    lr_mult: 1.0
+    lr_mult: 1
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 2
   }
   convolution_param {
     num_output: 60
@@ -227,7 +227,7 @@ layer {
   bottom: "Convolution4"
   top: "Convolution4"
   relu_param {
-    negative_slope: 0.00499999988824
+    negative_slope: 0.005
   }
 }
 layer {
@@ -253,10 +253,10 @@ layer {
   bottom: "Pooling2"
   top: "Convolution5"
   param {
-    lr_mult: 1.0
+    lr_mult: 1
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 2
   }
   convolution_param {
     num_output: 300
@@ -279,7 +279,7 @@ layer {
   bottom: "Convolution5"
   top: "Convolution5"
   relu_param {
-    negative_slope: 0.00499999988824
+    negative_slope: 0.005
   }
 }
 layer {
@@ -288,10 +288,10 @@ layer {
   bottom: "Convolution5"
   top: "Convolution6"
   param {
-    lr_mult: 1.0
+    lr_mult: 1
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 2
   }
   convolution_param {
     num_output: 300
@@ -314,7 +314,7 @@ layer {
   bottom: "Convolution6"
   top: "Convolution6"
   relu_param {
-    negative_slope: 0.00499999988824
+    negative_slope: 0.005
   }
 }
 layer {
@@ -340,10 +340,10 @@ layer {
   bottom: "Pooling3"
   top: "Convolution7"
   param {
-    lr_mult: 1.0
+    lr_mult: 1
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 2
   }
   convolution_param {
     num_output: 1500
@@ -366,7 +366,7 @@ layer {
   bottom: "Convolution7"
   top: "Convolution7"
   relu_param {
-    negative_slope: 0.00499999988824
+    negative_slope: 0.005
   }
 }
 layer {
@@ -375,10 +375,10 @@ layer {
   bottom: "Convolution7"
   top: "Convolution8"
   param {
-    lr_mult: 1.0
+    lr_mult: 1
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 2
   }
   convolution_param {
     num_output: 1500
@@ -401,7 +401,7 @@ layer {
   bottom: "Convolution8"
   top: "Convolution8"
   relu_param {
-    negative_slope: 0.00499999988824
+    negative_slope: 0.005
   }
 }
 layer {
@@ -410,8 +410,8 @@ layer {
   bottom: "Convolution8"
   top: "Deconvolution1"
   param {
-    lr_mult: 0.0
-    decay_mult: 0.0
+    lr_mult: 0
+    decay_mult: 0
   }
   convolution_param {
     num_output: 1500
@@ -426,7 +426,7 @@ layer {
     stride: 3
     weight_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
   }
 }
@@ -436,10 +436,10 @@ layer {
   bottom: "Deconvolution1"
   top: "Convolution9"
   param {
-    lr_mult: 1.0
+    lr_mult: 1
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 2
   }
   convolution_param {
     num_output: 300
@@ -475,10 +475,10 @@ layer {
   bottom: "MergeCrop1"
   top: "Convolution10"
   param {
-    lr_mult: 1.0
+    lr_mult: 1
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 2
   }
   convolution_param {
     num_output: 300
@@ -501,7 +501,7 @@ layer {
   bottom: "Convolution10"
   top: "Convolution10"
   relu_param {
-    negative_slope: 0.00499999988824
+    negative_slope: 0.005
   }
 }
 layer {
@@ -510,10 +510,10 @@ layer {
   bottom: "Convolution10"
   top: "Convolution11"
   param {
-    lr_mult: 1.0
+    lr_mult: 1
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 2
   }
   convolution_param {
     num_output: 300
@@ -536,7 +536,7 @@ layer {
   bottom: "Convolution11"
   top: "Convolution11"
   relu_param {
-    negative_slope: 0.00499999988824
+    negative_slope: 0.005
   }
 }
 layer {
@@ -545,8 +545,8 @@ layer {
   bottom: "Convolution11"
   top: "Deconvolution2"
   param {
-    lr_mult: 0.0
-    decay_mult: 0.0
+    lr_mult: 0
+    decay_mult: 0
   }
   convolution_param {
     num_output: 300
@@ -561,7 +561,7 @@ layer {
     stride: 2
     weight_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
   }
 }
@@ -571,10 +571,10 @@ layer {
   bottom: "Deconvolution2"
   top: "Convolution12"
   param {
-    lr_mult: 1.0
+    lr_mult: 1
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 2
   }
   convolution_param {
     num_output: 60
@@ -610,10 +610,10 @@ layer {
   bottom: "MergeCrop2"
   top: "Convolution13"
   param {
-    lr_mult: 1.0
+    lr_mult: 1
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 2
   }
   convolution_param {
     num_output: 60
@@ -636,7 +636,7 @@ layer {
   bottom: "Convolution13"
   top: "Convolution13"
   relu_param {
-    negative_slope: 0.00499999988824
+    negative_slope: 0.005
   }
 }
 layer {
@@ -645,10 +645,10 @@ layer {
   bottom: "Convolution13"
   top: "Convolution14"
   param {
-    lr_mult: 1.0
+    lr_mult: 1
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 2
   }
   convolution_param {
     num_output: 60
@@ -671,7 +671,7 @@ layer {
   bottom: "Convolution14"
   top: "Convolution14"
   relu_param {
-    negative_slope: 0.00499999988824
+    negative_slope: 0.005
   }
 }
 layer {
@@ -680,8 +680,8 @@ layer {
   bottom: "Convolution14"
   top: "Deconvolution3"
   param {
-    lr_mult: 0.0
-    decay_mult: 0.0
+    lr_mult: 0
+    decay_mult: 0
   }
   convolution_param {
     num_output: 60
@@ -696,7 +696,7 @@ layer {
     stride: 2
     weight_filler {
       type: "constant"
-      value: 1.0
+      value: 1
     }
   }
 }
@@ -706,10 +706,10 @@ layer {
   bottom: "Deconvolution3"
   top: "Convolution15"
   param {
-    lr_mult: 1.0
+    lr_mult: 1
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 2
   }
   convolution_param {
     num_output: 12
@@ -745,10 +745,10 @@ layer {
   bottom: "MergeCrop3"
   top: "Convolution16"
   param {
-    lr_mult: 1.0
+    lr_mult: 1
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 2
   }
   convolution_param {
     num_output: 12
@@ -771,7 +771,7 @@ layer {
   bottom: "Convolution16"
   top: "Convolution16"
   relu_param {
-    negative_slope: 0.00499999988824
+    negative_slope: 0.005
   }
 }
 layer {
@@ -780,10 +780,10 @@ layer {
   bottom: "Convolution16"
   top: "Convolution17"
   param {
-    lr_mult: 1.0
+    lr_mult: 1
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 2
   }
   convolution_param {
     num_output: 12
@@ -806,7 +806,7 @@ layer {
   bottom: "Convolution17"
   top: "Convolution17"
   relu_param {
-    negative_slope: 0.00499999988824
+    negative_slope: 0.005
   }
 }
 layer {
@@ -815,10 +815,10 @@ layer {
   bottom: "Convolution17"
   top: "aff_out"
   param {
-    lr_mult: 1.0
+    lr_mult: 1
   }
   param {
-    lr_mult: 2.0
+    lr_mult: 2
   }
   convolution_param {
     num_output: 3

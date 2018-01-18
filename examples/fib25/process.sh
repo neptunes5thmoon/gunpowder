@@ -17,6 +17,4 @@ NV_GPU=0 nvidia-docker run --rm \
     -w /run \
     --name ${NAME} \
     funkey/gunpowder:v0.3-pre5 \
-    /bin/bash -c "export PYTHONPATH=/custom:/src/malis:/src/waterz:/src/dvision:/src/augment:/src/caffe/python:/src
-    /caffe/python/caffe
-    :$PYTHONPATH; python -u process.py 0"
+    /bin/bash -c 'export PYTHONPATH="/custom:$PYTHONPATH"; python -u process.py 0 tf'

@@ -21,6 +21,4 @@ NV_GPU=0 nvidia-docker run --rm \
     -w /run \
     --name ${NAME} \
     ${CONTAINER} \
-    /bin/bash -c "export PYTHONPATH=/custom:/src/malis:/src/waterz:/src/dvision:/src/augment:/src/caffe/python:/src
-    /caffe/python/caffe
-    :$PYTHONPATH; python -u train.py 40000 0"
+    /bin/bash -c 'export PYTHONPATH="/custom:$PYTHONPATH"; python -u train.py 40000 0 tf'
