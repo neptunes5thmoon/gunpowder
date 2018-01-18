@@ -53,7 +53,7 @@ class Train(GenericTrain):
             outputs,
             gradients,
             array_specs,
-            spawn_subprocess=True)
+            spawn_subprocess=False)
         self.solver_parameters = solver_parameters
         self.use_gpu = use_gpu
         self.solver = None
