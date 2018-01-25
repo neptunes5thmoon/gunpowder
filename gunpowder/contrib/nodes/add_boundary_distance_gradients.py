@@ -3,31 +3,31 @@ import numpy as np
 
 from numpy.lib.stride_tricks import as_strided
 from scipy.ndimage.morphology import distance_transform_edt
-from gunpowder.volume import Volume, VolumeTypes
-from .batch_filter import BatchFilter
+from gunpowder.array import Array
+from gunpowder.nodes.batch_filter import BatchFilter
 
 logger = logging.getLogger(__name__)
 
 class AddBoundaryDistanceGradients(BatchFilter):
-    '''Add a volume with vectors pointing away from the closest boundary.
+    '''Add an array with vectors pointing away from the closest boundary.
 
     The vectors are the spacial gradients of the distance transform, i.e., the
     distance to the boundary between labels or the background label (0).
 
     Args:
 
-        label_volume_type(:class:``VolumeType``): The volume type to read the
-            labels from.
+        label_array_key(:class:``ArrayKey``): The array to read the labels
+            from.
 
-        gradient_volume_type(:class:``VolumeType``): The volume type to
-            generate containing the gradients.
+        gradient_array_key(:class:``ArrayKey``): The array to generate
+            containing the gradients.
 
-        distance_volume_type(:class:``VolumeType``, optional): The volume type
-            to generate containing the values of the distance transform.
+        distance_array_key(:class:``ArrayKey``, optional): The array to
+            generate containing the values of the distance transform.
 
-        boundary_volume_type(:class:``VolumeType``, optional): The volume type
-            to generate containing a boundary labeling. Note this volume will
-            be doubled as it encodes boundaries between voxels.
+        boundary_array_key(:class:``ArrayKey``, optional): The array to
+            generate containing a boundary labeling. Note this array will be
+            doubled as it encodes boundaries between voxels.
 
         normalize(string, optional): ``None``, ``'l1'``, or ``'l2'``. Specifies
             if and how to normalize the gradients.
@@ -42,61 +42,45 @@ class AddBoundaryDistanceGradients(BatchFilter):
 
     def __init__(
             self,
-            label_volume_type=None,
-            gradient_volume_type=None,
-            distance_volume_type=None,
-            boundary_volume_type=None,
+            label_array_key,
+            gradient_array_key,
+            distance_array_key=None,
+            boundary_array_key=None,
             normalize=None,
             scale=None,
             scale_args=None):
 
-        if label_volume_type is None:
-            label_volume_type = VolumeTypes.GT_LABELS
-
-        self.label_volume_type = label_volume_type
-        self.gradient_volume_type = gradient_volume_type
-        self.distance_volume_type = distance_volume_type
-        self.boundary_volume_type = boundary_volume_type
+        self.label_array_key = label_array_key
+        self.gradient_array_key = gradient_array_key
+        self.distance_array_key = distance_array_key
+        self.boundary_array_key = boundary_array_key
         self.normalize = normalize
         self.scale = scale
         self.scale_args = scale_args
 
     def setup(self):
 
-        assert self.label_volume_type in self.spec, (
+        assert self.label_array_key in self.spec, (
             "Upstream does not provide %s needed by "
-            "AddBoundaryDistanceGradients"%self.label_volume_type)
+            "AddBoundaryDistanceGradients"%self.label_array_key)
 
-        spec = self.spec[self.label_volume_type].copy()
+        spec = self.spec[self.label_array_key].copy()
         spec.dtype = np.float32
-        self.provides(self.gradient_volume_type, spec)
-        if self.distance_volume_type is not None:
-            self.provides(self.distance_volume_type, spec)
-        if self.boundary_volume_type is not None:
+        self.provides(self.gradient_array_key, spec)
+        if self.distance_array_key is not None:
+            self.provides(self.distance_array_key, spec)
+        if self.boundary_array_key is not None:
             spec.voxel_size /= 2
-            self.provides(self.boundary_volume_type, spec)
-
-    def prepare(self, request):
-
-        if self.gradient_volume_type in request:
-            del request[self.gradient_volume_type]
-
-        if (
-                self.distance_volume_type is not None and
-                self.distance_volume_type in request):
-            del request[self.distance_volume_type]
-        if (
-                self.boundary_volume_type is not None and
-                self.boundary_volume_type in request):
-            del request[self.boundary_volume_type]
+            self.provides(self.boundary_array_key, spec)
+        self.enable_autoskip()
 
     def process(self, batch, request):
 
-        if not self.gradient_volume_type in request:
+        if not self.gradient_array_key in request:
             return
 
-        labels = batch.volumes[self.label_volume_type].data
-        voxel_size = self.spec[self.label_volume_type].voxel_size
+        labels = batch.arrays[self.label_array_key].data
+        voxel_size = self.spec[self.label_array_key].voxel_size
 
         # get boundaries between label regions
         boundaries = self.__find_boundaries(labels)
@@ -136,26 +120,26 @@ class AddBoundaryDistanceGradients(BatchFilter):
         if self.scale is not None:
             self.__scale(gradients, distances, self.scale, self.scale_args)
 
-        spec = self.spec[self.gradient_volume_type].copy()
-        spec.roi = request[self.gradient_volume_type].roi
-        batch.volumes[self.gradient_volume_type] = Volume(gradients, spec)
+        spec = self.spec[self.gradient_array_key].copy()
+        spec.roi = request[self.gradient_array_key].roi
+        batch.arrays[self.gradient_array_key] = Array(gradients, spec)
 
         if (
-                self.distance_volume_type is not None and
-                self.distance_volume_type in request):
-            batch.volumes[self.distance_volume_type] = Volume(distances, spec)
+                self.distance_array_key is not None and
+                self.distance_array_key in request):
+            batch.arrays[self.distance_array_key] = Array(distances, spec)
 
         if (
-                self.boundary_volume_type is not None and
-                self.boundary_volume_type in request):
+                self.boundary_array_key is not None and
+                self.boundary_array_key in request):
 
             # add one more face at each dimension, as boundary map has shape
             # 2*s - 1 of original shape s
             grown = np.ones(tuple(s + 1 for s in boundaries.shape))
             grown[tuple(slice(0, s) for s in boundaries.shape)] = boundaries
             spec.voxel_size = voxel_size/2
-            logger.debug("voxel size of boundary volume: %s", spec.voxel_size)
-            batch.volumes[self.boundary_volume_type] = Volume(grown, spec)
+            logger.debug("voxel size of boundary array: %s", spec.voxel_size)
+            batch.arrays[self.boundary_array_key] = Array(grown, spec)
 
     def __find_boundaries(self, labels):
 

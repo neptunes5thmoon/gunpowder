@@ -13,15 +13,15 @@ def predict():
     roi_synapses  = Roi(offset=(9500, 2500, 8000), shape=(500, 500, 1500))
     shape_input     = roi_synapses.get_shape()
     shape_outputs = roi_synapses.get_shape()
-    request.add_volume_request(VolumeTypes.RAW, shape_input)
-    request.add_points_request(PointsTypes.PRESYN, shape_outputs)
-    request.add_volume_request(VolumeTypes.GT_BM_PRESYN, shape_outputs)
-    request.add_volume_request(VolumeTypes.GT_MASK_EXCLUSIVEZONE_PRESYN, shape_outputs)
-    request.add_volume_request(VolumeTypes.PRED_BM_PRESYN, shape_outputs)
+    request.add_array_request(ArrayKeys.RAW, shape_input)
+    request.add_points_request(PointsKeys.PRESYN, shape_outputs)
+    request.add_array_request(ArrayKeys.GT_BM_PRESYN, shape_outputs)
+    request.add_array_request(ArrayKeys.GT_MASK_EXCLUSIVEZONE_PRESYN, shape_outputs)
+    request.add_array_request(ArrayKeys.PRED_BM_PRESYN, shape_outputs)
 
     # shift batch request roi to desired offset
     request_offset = roi_synapses.get_offset()
-    for request_type in [request.volumes, request.points]:
+    for request_type in [request.arrays, request.points]:
         for type in request_type:
             request_type[type] += request_offset
 
@@ -29,15 +29,15 @@ def predict():
     chunk_spec_template   = BatchRequest()
     shape_input_template  = [132, 132, 132]
     shape_output_template = [44, 44, 44]
-    chunk_spec_template.add_volume_request(VolumeTypes.RAW, shape_input_template)
-    chunk_spec_template.add_points_request(PointsTypes.PRESYN, shape_output_template)
-    chunk_spec_template.add_volume_request(VolumeTypes.GT_BM_PRESYN, shape_output_template)
-    chunk_spec_template.add_volume_request(VolumeTypes.GT_MASK_EXCLUSIVEZONE_PRESYN, shape_output_template)
-    chunk_spec_template.add_volume_request(VolumeTypes.PRED_BM_PRESYN, shape_output_template)
+    chunk_spec_template.add_array_request(ArrayKeys.RAW, shape_input_template)
+    chunk_spec_template.add_points_request(PointsKeys.PRESYN, shape_output_template)
+    chunk_spec_template.add_array_request(ArrayKeys.GT_BM_PRESYN, shape_output_template)
+    chunk_spec_template.add_array_request(ArrayKeys.GT_MASK_EXCLUSIVEZONE_PRESYN, shape_output_template)
+    chunk_spec_template.add_array_request(ArrayKeys.PRED_BM_PRESYN, shape_output_template)
 
-    # define networks input, output names and VolumeTypes
-    input_names_to_types  = {'data': VolumeTypes.RAW}
-    output_names_to_types = {'bm_presyn_pred': VolumeTypes.PRED_BM_PRESYN}
+    # define networks input, output names and ArrayKeys
+    input_names_to_types  = {'data': ArrayKeys.RAW}
+    output_names_to_types = {'bm_presyn_pred': ArrayKeys.PRED_BM_PRESYN}
 
     # set for padding synapse points
     padding_syn_points = (44, 44, 44)
@@ -47,22 +47,22 @@ def predict():
                                 hostname = 'emdata2',
                                 port     = 8000,
                                 uuid     = 'cb7dc',
-                                volume_array_names = {
-                                                       VolumeTypes.RAW:       'grayscale',
-                                                       VolumeTypes.GT_LABELS: 'labels'
+                                array_array_names = {
+                                                       ArrayKeys.RAW:       'grayscale',
+                                                       ArrayKeys.GT_LABELS: 'labels'
                                                      },
                                 points_array_names = {
-                                                       PointsTypes.PRESYN: 'combined_synapses_08302016',
+                                                       PointsKeys.PRESYN: 'combined_synapses_08302016',
                                                      },
                                 points_rois        = {
-                                                       PointsTypes.PRESYN: roi_synapses.grow((0, 0, 0),
+                                                       PointsKeys.PRESYN: roi_synapses.grow((0, 0, 0),
                                                                                              padding_syn_points),
                                                      },
                                 resolution = (8,8,8)
                               ) +
                    Pad(
-                       {VolumeTypes.RAW: (88, 88, 88)},
-                       {VolumeTypes.RAW: 255}
+                       {ArrayKeys.RAW: (88, 88, 88)},
+                       {ArrayKeys.RAW: 255}
                       ) +
                     Normalize())
 
@@ -70,7 +70,7 @@ def predict():
     # define pipeline to process batches
     batch_provider_tree = (
             data_source +
-            AddGtBinaryMapOfPoints({PointsTypes.PRESYN: VolumeTypes.GT_BM_PRESYN}) +
+            AddGtBinaryMapOfPoints({PointsKeys.PRESYN: ArrayKeys.GT_BM_PRESYN}) +
             AddGtMaskExclusiveZone()+
             IntensityScaleShift(2, -1) +
             ZeroOutConstSections() +

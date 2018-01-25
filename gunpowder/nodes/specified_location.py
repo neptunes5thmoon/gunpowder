@@ -27,7 +27,7 @@ class SpecifiedLocation(BatchFilter):
         choose_randomly: bool, defines whether locations should be picked in order or at random from
         the list.
 
-        extra_data: list, array, A list of data that you want to be passed along with the volumes
+        extra_data: list, array, A list of data that you want to be passed along with the arrays
         provided by this node. This data will be appended as an attribute to the dataset so it must
         be a data format compatible with hdf5.
     '''
@@ -57,7 +57,7 @@ class SpecifiedLocation(BatchFilter):
             raise RuntimeError("Can not draw random samples from a provider\
                 that does not have a bounding box.")
 
-        # clear bounding boxes of all provided volumes and points --
+        # clear bounding boxes of all provided arrays and points --
         # SpecifiedLocation does know its locations at setup (checks on the fly)
         for identifier, spec in self.spec.items():
             spec.roi = None
@@ -75,13 +75,13 @@ class SpecifiedLocation(BatchFilter):
                 raise Exception(
                     "Requested %s, but upstream does not provide "
                     "it."%identifier)
-            type_shift_roi = provided_roi.shift(-request_roi.get_begin()).grow((0, 0, 0),
+            key_shift_roi = provided_roi.shift(-request_roi.get_begin()).grow((0, 0, 0),
                                                     -request_roi.get_shape())
 
             if shift_roi is None:
-                shift_roi = type_shift_roi
+                shift_roi = key_shift_roi
             else:
-                shift_roi = shift_roi.intersect(type_shift_roi)
+                shift_roi = shift_roi.intersect(key_shift_roi)
 
         logger.debug("valid shifts for request in " + str(shift_roi))
 
@@ -91,28 +91,28 @@ class SpecifiedLocation(BatchFilter):
         self.specified_shift = self._get_next_shift(center_shift)
 
         # Set shift for all requests
-        for specs_type in [request.volume_specs, request.points_specs]:
-            for (data_type, spec) in specs_type.items():
+        for specs_type in [request.array_specs, request.points_specs]:
+            for (key, spec) in specs_type.items():
                 roi = spec.roi.shift(self.specified_shift)
-                specs_type[data_type].roi = roi
+                specs_type[key].roi = roi
 
         logger.debug("{}'th shift selected: {}".format(self.loc_i, self.specified_shift))
 
     def process(self, batch, request):
         # reset ROIs to request
-        for (volume_type, spec) in request.volume_specs.items():
-            batch.volumes[volume_type].spec.roi = spec.roi
+        for (array_key, spec) in request.array_specs.items():
+            batch.arrays[array_key].spec.roi = spec.roi
             if self.extra_data is not None:
-                batch.volumes[volume_type].attrs['specified_location_extra_data'] =\
+                batch.arrays[array_key].attrs['specified_location_extra_data'] =\
                  self.extra_data[self.loc_i]
 
-        for (points_type, spec) in request.points_specs.items():
-            batch.points[points_type].spec.roi = spec.roi
+        for (points_key, spec) in request.points_specs.items():
+            batch.points[points_key].spec.roi = spec.roi
 
         # change shift point locations to lie within roi
-        for points_type in request.points_specs.keys():
-            for point_id, point in batch.points[points_type].data.items():
-                batch.points[points_type].data[point_id].location -= self.specified_shift
+        for points_key in request.points_specs.keys():
+            for point_id, point in batch.points[points_key].data.items():
+                batch.points[points_key].data[point_id].location -= self.specified_shift
 
     def _get_next_shift(self, center_shift):
         # gets next corrdinate from list
