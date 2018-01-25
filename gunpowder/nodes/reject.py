@@ -32,7 +32,7 @@ class Reject(BatchFilter):
 
             batch = self.upstream_provider.request_batch(request)
             mask_ratio = batch.volumes[self.mask_volume_type].data.mean()
-            have_good_batch = mask_ratio>=self.min_masked
+            have_good_batch = mask_ratio > self.min_masked
 
             if not have_good_batch and self.reject_probability < 1.:
                 have_good_batch = random.random() > self.reject_probability
