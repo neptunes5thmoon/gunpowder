@@ -18,6 +18,9 @@ class Normalize(BatchFilter):
 
     def process(self, batch, request):
 
+        if self.array not in batch.arrays:
+            return
+
         factor = self.factor
         array = batch.arrays[self.array]
 
@@ -28,6 +31,8 @@ class Normalize(BatchFilter):
 
             if array.data.dtype == np.uint8:
                 factor = 1.0/255
+            elif array.data.dtype == np.uint16:
+                factor = 1.0/(255*255)
             elif array.data.dtype == np.float32:
                 assert array.data.min() >= 0 and array.data.max() <= 1, (
                         "Values are float but not in [0,1], I don't know how "
