@@ -15,13 +15,14 @@ from .batch_provider import BatchProvider
 logger = logging.getLogger(__name__)
 
 class KlbSource(BatchProvider):
-    '''A KLB data source.
+    '''A `KLB <https://bitbucket.org/fernandoamat/keller-lab-block-filetype>`_
+    data source.
 
     Provides a single array from the given KLB dataset.
 
     Args:
 
-        filename (string):
+        filename (``string``):
 
             The name of the KLB file. This string can be a glob expression
             (e.g., ``frame_*.klb``), in which case all files that match are
@@ -30,11 +31,11 @@ class KlbSource(BatchProvider):
             voxel size of 1 (which can be overwritten using the ``array_spec``
             argument).
 
-        array (ArrayKey):
+        array (:class:`ArrayKey`):
 
             ArrayKey that this source offers.
 
-        array_spec (ArraySpec, optional):
+        array_spec (:class:`ArraySpec`, optional):
 
             An optional :class:`ArraySpec` to overwrite the array specs
             automatically determined from the KLB file. This is useful to set

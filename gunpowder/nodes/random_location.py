@@ -1,10 +1,13 @@
+import math
 import logging
 from random import random, randint, choice
 
 import numpy as np
+from scipy.spatial import KDTree
 from skimage.transform import integral_image, integrate
 from gunpowder.batch_request import BatchRequest
 from gunpowder.coordinate import Coordinate
+from gunpowder.points import Points
 from gunpowder.points_spec import PointsSpec
 from gunpowder.roi import Roi
 from .batch_filter import BatchFilter
@@ -15,40 +18,45 @@ class RandomLocation(BatchFilter):
     '''Choses a batch at a random location in the bounding box of the upstream
     provider.
 
-    The random location is chosen such that the batch request roi lies entirely
-    inside the provider's roi.
+    The random location is chosen such that the batch request ROI lies entirely
+    inside the provider's ROI.
 
-    If `min_masked` and `mask` are set, only batches are returned that have at
-    least the given ratio of masked-in voxels. This is in general faster than
-    using the ``Reject`` node, at the expense of storing an integral array of
-    the complete mask.
+    If ``min_masked`` and ``mask`` are set, only batches are returned that have
+    at least the given ratio of masked-in voxels. This is in general faster
+    than using the :class:`Reject` node, at the expense of storing an integral
+    array of the complete mask.
 
-    If 'ensure_nonempty' is set to a :class:``PointsKey``, only batches are
+    If ``ensure_nonempty`` is set to a :class:`PointsKey`, only batches are
     returned that have at least one point of this point collection within the
     requested ROI.
 
     Additional tests for randomly picked locations can be implemented by
-    subclassing and overwriting of :fun:`accepts`. This method takes the
+    subclassing and overwriting of :func:`accepts`. This method takes the
     randomly shifted request that meets all previous criteria (like
     ``min_masked`` and ``ensure_nonempty``) and should return ``True`` if the
     request is acceptable.
 
     Args:
 
-        min_masked(float, optional): If non-zero, require that the random
-            sample contains at least that ratio of masked-in voxels.
+        min_masked (``float``, optional):
 
-        mask(:class:``ArrayKey``): The array to use for mask checks.
+            If non-zero, require that the random sample contains at least that
+            ratio of masked-in voxels.
 
-        ensure_nonempty(:class:``PointsKey``, optional): Ensures that when
-            finding a random location, a request for ``ensure_nonempty`` will
-            one point. This does only work if all upstream
-            nodes are deterministic (e.g., there is no
-            :class:``RandomProvider`` upstream).
+        mask (:class:`ArrayKey`, optional):
 
-       p_nonempty(float, optional): If  ``ensure_nonempty`` is set, it defines
-            the probability that a request for ``ensure_nonempty`` will
-            contain at least one point. Default value is 1.0.
+            The array to use for mask checks.
+
+        ensure_nonempty (:class:`PointsKey`, optional):
+
+            Ensures that when finding a random location, a request for
+            ``ensure_nonempty`` will contain at least one point.
+
+        p_nonempty (``float``, optional):
+
+            If ``ensure_nonempty`` is set, it defines the probability that a
+            request for ``ensure_nonempty`` will contain at least one point.
+            Default value is 1.0.
     '''
 
     def __init__(self, min_masked=0, mask=None, ensure_nonempty=None, p_nonempty=1.0):
@@ -104,7 +112,9 @@ class RandomLocation(BatchFilter):
             points_request = BatchRequest({self.ensure_nonempty: points_spec})
             points_batch = upstream.request_batch(points_request)
 
-            self.points = points_batch.points[self.ensure_nonempty]
+            self.points = KDTree([
+                p.location
+                for p in points_batch[self.ensure_nonempty].data.values()])
 
             logger.info("retrieved %d points", len(self.points.data))
 
@@ -125,8 +135,8 @@ class RandomLocation(BatchFilter):
 
             lcm_voxel_size = self.spec.get_lcm_voxel_size(
                 request.array_specs.keys())
+            shift_roi = shift_roi.snap_to_grid(lcm_voxel_size, mode='shrink')
             lcm_shift_roi = shift_roi/lcm_voxel_size
-
             logger.debug("lcm voxel size: %s", lcm_voxel_size)
 
             logger.debug(
@@ -326,23 +336,19 @@ class RandomLocation(BatchFilter):
             #                 request.shape-1
 
             # pick a random point
-            point_id = choice(self.points.data.keys())
-            point = self.points.data[point_id]
+            point = choice(self.points.data)
 
-            logger.debug(
-                "select random point %d at %s",
-                point_id,
-                point.location)
+            logger.debug("select random point at %s", point)
 
             # get the lcm voxel that contains this point
-            lcm_location = Coordinate(point.location/lcm_voxel_size)
+            lcm_location = Coordinate(point/lcm_voxel_size)
             logger.debug(
                 "belongs to lcm voxel %s",
                 lcm_location)
 
             # mark all dimensions in which the point lies on the lower boundary
             # of the lcm voxel
-            on_lower_boundary = lcm_location*lcm_voxel_size == point.location
+            on_lower_boundary = lcm_location*lcm_voxel_size == point
             logger.debug(
                 "lies on the lower boundary of the lcm voxel in dimensions %s",
                 on_lower_boundary)
@@ -379,7 +385,7 @@ class RandomLocation(BatchFilter):
             if not lcm_point_shift_roi.intersects(lcm_shift_roi):
                 logger.debug(
                     "reject random shift, random point %s shift ROI %s does "
-                    "not intersect total shift ROI %s", point.location,
+                    "not intersect total shift ROI %s", point,
                     lcm_point_shift_roi, lcm_shift_roi)
                 continue
             lcm_point_shift_roi = lcm_point_shift_roi.intersect(lcm_shift_roi)
@@ -391,17 +397,12 @@ class RandomLocation(BatchFilter):
             logger.debug("random shift: %s", random_shift)
 
             # count all points inside the shifted ROI
-            points_request = BatchRequest()
-            points_request[self.ensure_nonempty] = PointsSpec(
-                roi=request_points_roi.shift(random_shift))
-            logger.debug("points request: %s", points_request)
-            points_batch = self.get_upstream_provider().request_batch(points_request)
-
-            point_ids = points_batch.points[self.ensure_nonempty].data.keys()
-            assert point_id in point_ids, (
+            points = self.__get_points_in_roi(
+                request_points_roi.shift(random_shift))
+            assert point in points, (
                 "Requested batch to contain point %s, but got points "
-                "%s"%(point_id, point_ids))
-            num_points = len(point_ids)
+                "%s"%(point, points))
+            num_points = len(points)
 
             # accept this shift with p=1/num_points
             #
@@ -420,3 +421,17 @@ class RandomLocation(BatchFilter):
         random_shift *= lcm_voxel_size
 
         return random_shift
+
+    def __get_points_in_roi(self, roi):
+
+        points = []
+
+        center = roi.get_center()
+        radius = math.ceil(float(max(roi.get_shape()))/2)
+        candidates = self.points.query_ball_point(center, radius, p=np.inf)
+
+        for i in candidates:
+            if roi.contains(self.points.data[i]):
+                points.append(self.points.data[i])
+
+        return np.array(points)

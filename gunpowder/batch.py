@@ -3,12 +3,15 @@ import multiprocessing
 
 from .freezable import Freezable
 from .profiling import ProfilingStats
+from .array import Array, ArrayKey
+from .points import Points, PointsKey
 
 logger = logging.getLogger(__name__)
 
 class Batch(Freezable):
     '''Contains the requested batch as a collection of :class:`Arrays<Array>`
-    and :class:`Points`.
+    and :class:`Points` that is passed through the pipeline from sources to
+    sinks.
 
     This collection mimics a dictionary. Items can be added with::
 
@@ -27,6 +30,16 @@ class Batch(Freezable):
 
     To access only arrays or point sets, use the dictionaries ``batch.arrays``
     or ``batch.points``, respectively.
+
+    Attributes:
+
+        arrays (dict from :class:`ArrayKey` to :class:`Array`):
+
+            Contains all arrays that have been requested for this batch.
+
+        points (dict from :class:`PointsKey` to :class:`Points`):
+
+            Contains all point sets that have been requested for this batch.
     '''
 
     __next_id = multiprocessing.Value('L')

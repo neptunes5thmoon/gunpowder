@@ -9,20 +9,30 @@ class GrowBoundary(BatchFilter):
     border of the batch or an optionally provided mask.
 
     Args:
-        labels(:class:``ArrayKey``): The array containing labels.
 
-        mask(:class:``ArrayKey``, optional): A mask indicating unknown
-            regions. This is to avoid boundaries to grow between labelled and
-            unknown regions.
+        labels (:class:`ArrayKey`):
 
-        steps(int): Number of voxels (not world units!) to grow.
+            The array containing labels.
 
-        background(int): The label to assign to the boundary voxels.
+        mask (:class:`ArrayKey`, optional):
 
-        only_xy(bool): Do not grow a boundary in the z direction.
+            A mask indicating unknown regions. This is to avoid boundaries to
+            grow between labelled and unknown regions.
+
+        steps (``int``, optional):
+
+            Number of voxels (not world units!) to grow.
+
+        background (``int``, optional):
+
+            The label to assign to the boundary voxels.
+
+        only_xy (``bool``, optional):
+
+            Do not grow a boundary in the z direction.
     '''
 
-    def __init__(self, labels, mask, steps=1, background=0, only_xy=False):
+    def __init__(self, labels, mask=None, steps=1, background=0, only_xy=False):
         self.labels = labels
         self.mask = mask
         self.steps = steps
