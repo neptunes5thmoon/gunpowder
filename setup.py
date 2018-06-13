@@ -23,7 +23,7 @@ subprocess.call('pip install git+https://github.com/funkey/augment#egg=augment'.
 
 setup(
         name='gunpowder',
-        version='0.3',
+        version='0.3.1',
         description='Data loading DAG for Greentea.',
         url='https://github.com/funkey/gunpowder',
         author='Jan Funke',
@@ -38,7 +38,8 @@ setup(
             'gunpowder.tensorflow.nodes',
             'gunpowder.contrib',
             'gunpowder.contrib.nodes',
-            'gunpowder.ext'
+            'gunpowder.ext',
+            'gunpowder.zoo'
         ],
         install_requires=[
             "numpy",
