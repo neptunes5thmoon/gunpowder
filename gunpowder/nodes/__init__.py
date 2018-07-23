@@ -36,3 +36,4 @@ from .simple_augment import SimpleAugment
 from .snapshot import Snapshot
 from .specified_location import SpecifiedLocation
 from .zarr_source import ZarrSource
+from .zarr_write import ZarrWrite
