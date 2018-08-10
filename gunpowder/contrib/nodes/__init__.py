@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from .add_blobs_from_points import AddBlobsFromPoints
 from .add_boundary_distance import AddBoundaryDistance
+from .add_distance import AddDistance
 from .add_pre_post_cleft_distance import AddPrePostCleftDistance
 from .add_boundary_distance_gradients import AddBoundaryDistanceGradients
 from .add_gt_mask_exclusive_zone import AddGtMaskExclusiveZone
