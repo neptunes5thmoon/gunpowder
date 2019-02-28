@@ -155,7 +155,7 @@ class Train(GenericTrain):
             self.__read_meta_graph()
 
         if self.summary is not None:
-            self.summary_saver = tf.summary.FileWriter(self.log_dir, self.graph)
+            self.summary_saver = tf.summary.FileWriter(self.log_dir, self.graph, flush_secs=3)
 
         if self.optimizer_func is None:
 
