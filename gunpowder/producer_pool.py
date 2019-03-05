@@ -8,6 +8,8 @@ import os
 import sys
 import time
 import traceback
+import numpy as np
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -113,7 +115,8 @@ class ProducerPool(object):
             logger.info("done")
 
     def __run_worker(self, target):
-
+        rng = random.SystemRandom()
+        np.random.seed(rng.randint(0, 2**32-1))
         parent_pid = os.getppid()
 
         logger.debug("worker started with PID " + str(os.getpid()))
