@@ -32,6 +32,7 @@ from .random_location import RandomLocation
 from .random_provider import RandomProvider
 from .rasterize_points import RasterizationSettings, RasterizePoints
 from .reject import Reject
+from .reject_efficiently import RejectEfficiently
 from .renumber_connected_components import RenumberConnectedComponents
 from .scan import Scan
 from .simple_augment import SimpleAugment
