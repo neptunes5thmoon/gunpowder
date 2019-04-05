@@ -174,7 +174,12 @@ class Hdf5LikeSource(BatchProvider):
 
     def __read(self, data_file, ds_name, roi):
         c = len(data_file[ds_name].shape) - self.ndims
-        return np.asarray(data_file[ds_name][(slice(None),)*c + roi.to_slices()])
+        try:
+            a = np.asarray(data_file[ds_name][(slice(None),)*c + roi.to_slices()])
+        except RuntimeError as e:
+            logger.warning("RunTime Error on dataset: " + self.filename+' - '+ds_name)
+            raise e
+        return a
 
     def __repr__(self):
 
