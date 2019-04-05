@@ -134,7 +134,6 @@ class Hdf5LikeSource(BatchProvider):
                                "might not be what you want.",
                                self.filename, array_key, ds_name, spec.voxel_size)
             spec.voxel_size = voxel_size
-
         self.ndims = len(spec.voxel_size)
 
         if spec.roi is None:
@@ -166,6 +165,10 @@ class Hdf5LikeSource(BatchProvider):
                            "set to %s. This might not be what you want.",
                            array_key, ds_name, spec.dtype,
                            spec.interpolatable)
+
+        logger.warning("Check that offset and resolution are read in correct order for %s / %s - shape in world "
+                       "coordinates! %s, resolution: %s, offset: %s", self.filename, ds_name, spec.roi.get_shape(),
+                       spec.voxel_size, spec.roi.get_offset())
 
         return spec
 
