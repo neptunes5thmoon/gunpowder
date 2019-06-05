@@ -8,7 +8,7 @@ from gunpowder.nodes.batch_filter import BatchFilter
 logger = logging.getLogger(__name__)
 
 
-class AddDistanceWIP(BatchFilter):
+class AddDistanceIsotropic(BatchFilter):
     '''Compute array with signed distances from specific labels
 
     Args:
@@ -63,9 +63,9 @@ class AddDistanceWIP(BatchFilter):
 
         spec = self.spec[self.label_array_key].copy()
         spec.dtype = np.float32
+        assert len(set(spec.voxel_size)) == 1, "This node only works with isotropic data"
         spec.voxel_size *= self.factor
         self.provides(self.distance_array_key, spec)
-        self.provides(self.mask_array_key, spec)
 
     def prepare(self, request):
 
@@ -100,10 +100,7 @@ class AddDistanceWIP(BatchFilter):
 
         else:
             sampling = tuple(float(v) for v in voxel_size)
-            distances = self.__signed_distance(binary_label * np.logical_not(mask), sampling=sampling)
-
-        # modify in-place the label mask
-        mask = self.__constrain_distances(mask, distances)
+            distances = self.__signed_distance(binary_label, sampling=sampling)
 
         if isinstance(self.factor, tuple):
             slices = tuple(slice(None, None, k) for k in self.factor)
@@ -111,7 +108,10 @@ class AddDistanceWIP(BatchFilter):
             slices = tuple(slice(None, None, self.factor) for _ in range(dims))
 
         distances = distances[slices]
-        mask = mask[slices]
+
+        # modify in-place the label mask
+        mask_voxel_size = tuple(float(v) for v in self.spec[self.mask_array_key].voxel_size)
+        mask = self.__constrain_distances(mask, distances, mask_voxel_size)
 
         if self.normalize is not None:
             distances = self.__normalize(distances, self.normalize, self.normalize_args)
@@ -141,7 +141,7 @@ class AddDistanceWIP(BatchFilter):
         # between the distance transform of the label ("inner distances") and the distance transform of
         # the complement of the label ("outer distances"). To compensate for an edge effect, .5 (half a pixel's
         # distance) is added to the positive distances and subtracted from the negative distances.
-        tweak = .5
+        tweak = kwargs['sampling'][0]*.5
         inner_distance = distance_transform_edt(label, **kwargs)
         outer_distance = distance_transform_edt(np.logical_not(label), **kwargs)
         result = inner_distance - outer_distance
@@ -151,14 +151,15 @@ class AddDistanceWIP(BatchFilter):
         return result
 
     @staticmethod
-    def __constrain_distances(mask, distances):
+    def __constrain_distances(mask, distances, mask_sampling):
         # remove elements from the mask where the label distances exceed the distance from the boundary
 
-        tmp = np.zeros(mask.shape, dtype=mask.dtype)
+        tmp = np.zeros(np.array(mask.shape) + np.array((2,)*mask.ndim), dtype=mask.dtype)
         slices = tmp.ndim * (slice(1, -1),)
-        tmp[slices] = mask[slices]
-        boundary_distance = distance_transform_edt(tmp)
+        tmp[slices] = mask
+        boundary_distance = distance_transform_edt(tmp, sampling=mask_sampling)
+        boundary_distance = boundary_distance[slices]
         mask_output = mask.copy()
-        mask_output[distances > boundary_distance] = 0
+        mask_output[abs(distances) > boundary_distance] = 0
 
         return mask_output
