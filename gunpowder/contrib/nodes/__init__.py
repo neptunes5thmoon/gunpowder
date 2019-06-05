@@ -12,4 +12,5 @@ from .add_vector_map import AddVectorMap
 from .dvid_partner_annotation_source import DvidPartnerAnnotationSource
 from .hdf5_points_source import Hdf5PointsSource
 from .prepare_malis import PrepareMalis
+from .tanh_saturate import TanhSaturate
 from .zero_out_const_sections import ZeroOutConstSections
