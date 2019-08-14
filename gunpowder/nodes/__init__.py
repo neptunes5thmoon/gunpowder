@@ -29,6 +29,7 @@ from .pad import Pad
 from .precache import PreCache
 from .print_profiling_stats import PrintProfilingStats
 from .random_location import RandomLocation
+from .random_location_with_integral_mask import RandomLocationWithIntegralMask
 from .random_provider import RandomProvider
 from .rasterize_points import RasterizationSettings, RasterizePoints
 from .reject import Reject
