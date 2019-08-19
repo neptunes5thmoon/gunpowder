@@ -91,18 +91,18 @@ class RasterizePoints(BatchFilter):
 
     Args:
 
-        points (:class:``PointsKeys``):
+        points (:class:`PointsKeys`):
             The key of the points to rasterize.
 
-        array (:class:``ArrayKey``):
+        array (:class:`ArrayKey`):
             The key of the binary array to create.
 
-        array_spec (:class:``ArraySpec``, optional):
+        array_spec (:class:`ArraySpec`, optional):
 
             The spec of the array to create. Use this to set the datatype and
             voxel size.
 
-        settings (:class:``RasterizationSettings``, optional):
+        settings (:class:`RasterizationSettings`, optional):
             Which settings to use to rasterize the points.
     '''
 
@@ -215,21 +215,26 @@ class RasterizePoints(BatchFilter):
             if 0 in labels:
                 labels.remove(0)
 
-            # create data for the whole points ROI, "or"ed together over
-            # individual object masks
-            rasterized_points_data = np.sum(
-                [
-                    self.__rasterize(
-                        points,
-                        data_roi,
-                        voxel_size,
-                        self.spec[self.array].dtype,
-                        self.settings,
-                        Array(data=mask_array.data==label, spec=mask_array.spec))
+            if len(labels) == 0:
+                logger.debug("Points and provided object mask do not overlap. No points to rasterize.")
+                rasterized_points_data = np.zeros(data_roi.get_shape(),
+                                                  dtype=self.spec[self.array].dtype)
+            else:
+                # create data for the whole points ROI, "or"ed together over
+                # individual object masks
+                rasterized_points_data = np.sum(
+                    [
+                        self.__rasterize(
+                            points,
+                            data_roi,
+                            voxel_size,
+                            self.spec[self.array].dtype,
+                            self.settings,
+                            Array(data=mask_array.data==label, spec=mask_array.spec))
 
-                    for label in labels
-                ],
-                axis=0)
+                        for label in labels
+                    ],
+                    axis=0)
 
         else:
 
@@ -263,9 +268,7 @@ class RasterizePoints(BatchFilter):
         if self.points in request:
             request_roi = request[self.points].roi
             points.spec.roi = request_roi
-            for i, p in points.data.items():
-                if not request_roi.contains(p.location):
-                    del points.data[i]
+            points.data = {i: p for i, p in points.data.items() if request_roi.contains(p.location)}
 
         # restore requested mask
         if mask is not None:

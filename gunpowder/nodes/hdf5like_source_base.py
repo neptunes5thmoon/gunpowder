@@ -37,12 +37,21 @@ class Hdf5LikeSource(BatchProvider):
             the array specs automatically determined from the data file. This
             is useful to set a missing ``voxel_size``, for example. Only fields
             that are not ``None`` in the given :class:`ArraySpec` will be used.
+
+        channels_first (``bool``, optional):
+
+            Specifies the ordering of the dimensions of the HDF5-like data source.
+            If channels_first is set (default), then the input shape is expected
+            to be (channels, spatial dimensions). This is recommended due to
+            better performance. If channels_first is set to false, then the input
+            data is read in channels_last manner and converted to channels_first.
     '''
     def __init__(
             self,
             filename,
             datasets,
-            array_specs=None):
+            array_specs=None,
+            channels_first=True):
 
         self.filename = filename
         self.datasets = datasets
@@ -51,6 +60,8 @@ class Hdf5LikeSource(BatchProvider):
             self.array_specs = {}
         else:
             self.array_specs = array_specs
+
+        self.channels_first = channels_first
 
         # number of spatial dimensions
         self.ndims = None
@@ -141,7 +152,11 @@ class Hdf5LikeSource(BatchProvider):
             if offset is None:
                 offset = Coordinate((0,)*self.ndims)
 
-            shape= Coordinate(dataset.shape[-self.ndims:])
+            if self.channels_first:
+                shape = Coordinate(dataset.shape[-self.ndims:])
+            else:
+                shape = Coordinate(dataset.shape[:self.ndims])
+
             spec.roi = Roi(offset, shape*spec.voxel_size)
 
         if spec.dtype is not None:
@@ -173,13 +188,18 @@ class Hdf5LikeSource(BatchProvider):
         return spec
 
     def __read(self, data_file, ds_name, roi):
+
         c = len(data_file[ds_name].shape) - self.ndims
-        try:
-            a = np.asarray(data_file[ds_name][(slice(None),)*c + roi.to_slices()])
-        except RuntimeError as e:
-            logger.warning("RunTime Error on dataset: " + self.filename+' - '+ds_name)
-            raise e
-        return a
+
+
+        if self.channels_first:
+            array = np.asarray(data_file[ds_name][(slice(None),) * c + roi.to_slices()])
+        else:
+            array = np.asarray(data_file[ds_name][roi.to_slices() + (slice(None),) * c])
+            array = np.transpose(array,
+                                 axes=[i + self.ndims for i in range(c)] + list(range(self.ndims)))
+
+        return array
 
     def __repr__(self):
 

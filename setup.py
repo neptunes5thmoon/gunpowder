@@ -1,5 +1,5 @@
+import os
 from setuptools import setup
-import subprocess
 try:
     import base_string as string_types
 except ImportError:
@@ -19,11 +19,17 @@ for value in extras_require.values():
 
 extras_require['full'] = list(dep_set)
 
-subprocess.call('pip install git+https://github.com/funkey/augment#egg=augment'.split())
+name = 'gunpowder'
+here = os.path.abspath(os.path.dirname(__file__))
+version_info = {}
+with open(os.path.join(here, name, 'version_info.py')) as fp:
+    exec(fp.read(), version_info)
+version = version_info['_version']
+
 
 setup(
-        name='gunpowder',
-        version='0.3.1',
+        name=name,
+        version=str(version),
         description='Data loading DAG for Greentea.',
         url='https://github.com/funkey/gunpowder',
         author='Jan Funke',
@@ -39,14 +45,16 @@ setup(
             'gunpowder.contrib',
             'gunpowder.contrib.nodes',
             'gunpowder.ext',
-            'gunpowder.zoo'
+            'gunpowder.zoo',
+            'gunpowder.zoo.tensorflow'
         ],
         install_requires=[
             "numpy",
             "scipy",
             "h5py",
             "scikit-image",
-            "requests"
+            "requests",
+            "augment-nd"
         ],
         extras_require=extras_require,
 )

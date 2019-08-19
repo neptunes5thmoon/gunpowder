@@ -8,6 +8,7 @@ from .batch_filter import BatchFilter
 from .batch_provider import BatchProvider
 from .crop import Crop
 from .csv_points_source import CsvPointsSource
+from .daisy_request_blocks import DaisyRequestBlocks
 from .defect_augment import DefectAugment
 from .downsample import DownSample
 from .dvid_source import DvidSource
@@ -36,6 +37,7 @@ from .reject import Reject
 from .reject_efficiently import RejectEfficiently
 from .renumber_connected_components import RenumberConnectedComponents
 from .scan import Scan
+from .shift_augment import ShiftAugment
 from .simple_augment import SimpleAugment
 from .snapshot import Snapshot
 from .specified_location import SpecifiedLocation

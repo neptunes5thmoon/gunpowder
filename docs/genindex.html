@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; gunpowder 0.3 documentation</title>
+  <title>Index &mdash; gunpowder 1.0.0rc0.dev0 documentation</title>
   
 
   
@@ -61,7 +61,7 @@
             
             
               <div class="version">
-                0.3
+                1.0
               </div>
             
           
@@ -95,7 +95,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipelines</a></li>
-<li class="toctree-l1"><a class="reference internal" href="requests_batches.html">Batch Requests and Batches</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api.html#data-containers">Data Containers</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api.html#batch">Batch</a></li>
@@ -191,6 +190,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="custom_providers.html">Writing Custom Batch Providers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial: boundary prediction for instance segmentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#create-a-network-to-train-with">Create a network to train with</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#assemble-the-training-pipeline">Assemble the training pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#assemble-the-testing-pipeline">Assemble the testing pipeline</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -236,7 +241,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li></li>
+      <li>Index</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -384,8 +389,6 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#gunpowder.Roi.get_begin">get_begin() (gunpowder.Roi method)</a>
 </li>
-      <li><a href="api.html#gunpowder.Roi.get_bounding_box">get_bounding_box() (gunpowder.Roi method)</a>
-</li>
       <li><a href="api.html#gunpowder.Roi.get_end">get_end() (gunpowder.Roi method)</a>
 </li>
       <li><a href="api.html#gunpowder.Roi.grow">grow() (gunpowder.Roi method)</a>
@@ -394,7 +397,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#gunpowder.GrowBoundary">GrowBoundary (class in gunpowder)</a>
 </li>
-      <li><a href="api.html#module-gunpowder">gunpowder (module)</a>, <a href="api.html#module-gunpowder">[1]</a>, <a href="first_steps.html#module-gunpowder">[2]</a>, <a href="pipeline.html#module-gunpowder">[3]</a>
+      <li><a href="api.html#module-gunpowder">gunpowder (module)</a>, <a href="api.html#module-gunpowder">[1]</a>, <a href="first_steps.html#module-gunpowder">[2]</a>, <a href="install.html#module-gunpowder">[3]</a>, <a href="pipeline.html#module-gunpowder">[4]</a>, <a href="tutorial.html#module-gunpowder">[5]</a>
 </li>
       <li><a href="api.html#module-gunpowder.caffe">gunpowder.caffe (module)</a>
 </li>
@@ -600,6 +603,8 @@
         <li><a href="api.html#gunpowder.BatchProvider.teardown">(gunpowder.BatchProvider method)</a>
 </li>
       </ul></li>
+      <li><a href="api.html#gunpowder.Roi.to_slices">to_slices() (gunpowder.Roi method)</a>
+</li>
       <li><a href="api.html#gunpowder.caffe.Train">Train (class in gunpowder.caffe)</a>
 
       <ul>
@@ -659,7 +664,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Jan Funke.
+        &copy; Copyright 2019, Jan Funke, Renate Krause, Julia Buhmann, Rodrigo Ceballos Lentini, William Grisaitis, Chris Barnes, Caroline Malin-Mayor, Larissa Heinrich, Philipp Hanslovsky, Sherry Ding, Andrew Champion, Arlo Sheridan, Constantin Pape.
 
     </p>
   </div>
@@ -681,7 +686,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.3',
+            VERSION:'1.0.0rc0.dev0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -692,7 +697,8 @@
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

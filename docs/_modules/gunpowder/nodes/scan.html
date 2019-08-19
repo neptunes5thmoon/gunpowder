@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>gunpowder.nodes.scan &mdash; gunpowder 0.3 documentation</title>
+  <title>gunpowder.nodes.scan &mdash; gunpowder 1.0.0rc0.dev0 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.3
+                1.0
               </div>
             
           
@@ -94,7 +94,6 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pipeline.html">Pipelines</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../requests_batches.html">Batch Requests and Batches</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api.html#data-containers">Data Containers</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api.html#batch">Batch</a></li>
@@ -190,6 +189,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../custom_providers.html">Writing Custom Batch Providers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorial: boundary prediction for instance segmentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorial.html#create-a-network-to-train-with">Create a network to train with</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorial.html#assemble-the-training-pipeline">Assemble the training pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorial.html#assemble-the-testing-pipeline">Assemble the testing pipeline</a></li>
+</ul>
+</li>
 </ul>
 
             
@@ -264,7 +269,7 @@
 <span class="kn">from</span> <span class="nn">gunpowder.roi</span> <span class="k">import</span> <span class="n">Roi</span>
 <span class="kn">from</span> <span class="nn">.batch_filter</span> <span class="k">import</span> <span class="n">BatchFilter</span>
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Scan"><a class="viewcode-back" href="../../../api.html#gunpowder.Scan">[docs]</a><span class="k">class</span> <span class="nc">Scan</span><span class="p">(</span><span class="n">BatchFilter</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Iteratively requests batches of size ``reference`` from upstream</span>
@@ -350,7 +355,7 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">empty_request</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__add_to_batch</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">chunk</span><span class="p">)</span>
 
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;processed chunk </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">num_chunks</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;processed chunk </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_chunks</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
 
@@ -362,7 +367,7 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">empty_request</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">__add_to_batch</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">chunk</span><span class="p">)</span>
 
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;processed chunk </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">num_chunks</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;processed chunk </span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_chunks</span><span class="p">)</span>
 
         <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch</span> <span class="o">=</span> <span class="kc">None</span>
@@ -416,10 +421,26 @@
         <span class="c1"># get individual shift ROIs and intersect them</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">reference_spec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
 
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s2">&quot;getting shift roi for </span><span class="si">%s</span><span class="s2"> with spec </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">key</span><span class="p">,</span>
+                <span class="n">reference_spec</span><span class="p">)</span>
+
             <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">spec</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;skipping, </span><span class="si">%s</span><span class="s2"> not in upstream spec&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">spec</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">roi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;skipping, </span><span class="si">%s</span><span class="s2"> has not ROI&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
                 <span class="k">continue</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;upstream ROI is </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">spec</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">roi</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                    <span class="n">reference_spec</span><span class="o">.</span><span class="n">roi</span><span class="o">.</span><span class="n">get_shape</span><span class="p">(),</span>
+                    <span class="n">spec</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">roi</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()):</span>
+                <span class="k">assert</span> <span class="n">r</span> <span class="o">&lt;=</span> <span class="n">s</span><span class="p">,</span> <span class="p">(</span>
+                    <span class="s2">&quot;reference </span><span class="si">%s</span><span class="s2"> with ROI </span><span class="si">%s</span><span class="s2"> does not fit into provided &quot;</span>
+                    <span class="s2">&quot;upstream </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">reference_spec</span><span class="o">.</span><span class="n">roi</span><span class="p">,</span> <span class="n">spec</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">roi</span><span class="p">))</span>
 
             <span class="c1"># we have a reference ROI</span>
             <span class="c1">#</span>
@@ -462,6 +483,8 @@
             <span class="c1"># create a ROI...</span>
             <span class="n">shift_roi</span> <span class="o">=</span> <span class="n">Roi</span><span class="p">(</span><span class="n">shift_begin</span><span class="p">,</span> <span class="n">shift_shape</span><span class="p">)</span>
 
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;shift ROI for </span><span class="si">%s</span><span class="s2"> is </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">shift_roi</span><span class="p">)</span>
+
             <span class="c1"># ...and intersect it with previous shift ROIs</span>
             <span class="k">if</span> <span class="n">total_shift_roi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">total_shift_roi</span> <span class="o">=</span> <span class="n">shift_roi</span>
@@ -472,6 +495,9 @@
                                        <span class="s2">&quot;the reference </span><span class="si">%s</span><span class="s2"> are contained in the &quot;</span>
                                        <span class="s2">&quot;request/upstream ROIs &quot;</span>
                                        <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reference</span><span class="p">,</span> <span class="n">spec</span><span class="p">))</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;intersected with total shift ROI this yields </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">total_shift_roi</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">total_shift_roi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;None of the upstream ROIs are bounded (all &quot;</span>
@@ -638,7 +664,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Jan Funke.
+        &copy; Copyright 2019, Jan Funke, Renate Krause, Julia Buhmann, Rodrigo Ceballos Lentini, William Grisaitis, Chris Barnes, Caroline Malin-Mayor, Larissa Heinrich, Philipp Hanslovsky, Sherry Ding, Andrew Champion, Arlo Sheridan, Constantin Pape.
 
     </p>
   </div>
@@ -660,7 +686,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.3',
+            VERSION:'1.0.0rc0.dev0',
             LANGUAGE:'None',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
@@ -671,7 +697,8 @@
       <script type="text/javascript" src="../../../_static/jquery.js"></script>
       <script type="text/javascript" src="../../../_static/underscore.js"></script>
       <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+      <script type="text/javascript" src="../../../_static/language_data.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 
