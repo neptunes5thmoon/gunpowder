@@ -192,7 +192,8 @@ class Train(GenericTrain):
 
         # compute outputs, gradients, and update variables
         if self.summary is not None:
-            outputs, summaries = self.session.run([to_compute, self.summary], feed_dict=inputs)
+            outputs, summaries = self.session.run([to_compute, self.summary], feed_dict=inputs, 
+                                                  options=tf.RunOptions(report_tensor_allocations_upon_oom=True))
         else:
             outputs = self.session.run(to_compute, feed_dict=inputs)
 
