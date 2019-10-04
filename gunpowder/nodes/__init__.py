@@ -21,6 +21,7 @@ from .hdf5_write import Hdf5Write
 from .intensity_augment import IntensityAugment
 from .intensity_scale_shift import IntensityScaleShift
 from .klb_source import KlbSource
+from .lambda_filter import LambdaFilter
 from .lambda_source import LambdaSource
 from .merge_provider import MergeProvider
 from .n5_source import N5Source
