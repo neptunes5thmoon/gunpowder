@@ -13,5 +13,6 @@ from .dvid_partner_annotation_source import DvidPartnerAnnotationSource
 from .hdf5_points_source import Hdf5PointsSource
 from .intensity_crop import IntensityCrop
 from .prepare_malis import PrepareMalis
+from .sum import Sum
 from .tanh_saturate import TanhSaturate
 from .zero_out_const_sections import ZeroOutConstSections
