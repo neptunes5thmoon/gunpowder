@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from .balance_by_threshold import BalanceByThreshold
 from .add_affinities import AddAffinities
 from .balance_by_threshold import BalanceByThreshold
+from .balance_global_by_threshold import BalanceGlobalByThreshold
 from .balance_labels import BalanceLabels
 from .batch_filter import BatchFilter
 from .batch_provider import BatchProvider
