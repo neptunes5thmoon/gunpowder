@@ -12,6 +12,7 @@ from .crop_array import CropArray
 from .combine_distances import CombineDistances
 from .dvid_partner_annotation_source import DvidPartnerAnnotationSource
 from .hdf5_points_source import Hdf5PointsSource
+from .impulse_noise_augment import ImpulseNoiseAugment
 from .intensity_crop import IntensityCrop
 from .prepare_malis import PrepareMalis
 from .sum import Sum
