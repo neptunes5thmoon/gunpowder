@@ -221,11 +221,9 @@ class DeformAugment(BatchFilter):
         # smaller requested ROIs at their respective voxel resolution.
         # crop the parts corresponding to the requested ROIs
         self.transformations = {}
-        deps = BatchRequest()
         for key, spec in request.items():
             if key == self.transform_key:
                 continue
-            spec = spec.copy()
 
             if spec.roi is None:
                 continue
@@ -298,11 +296,7 @@ class DeformAugment(BatchFilter):
                 + source_roi.shape[-self.spatial_dims :],
             )
 
-            deps[key] = spec
-
             logger.debug("upstream request roi for %s = %s" % (key, spec.roi))
-
-        return deps
 
     def process(self, batch, request):
         out_batch = Batch()
