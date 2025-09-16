@@ -22,42 +22,42 @@ class NoSuchModule(object):
 try:
     import dvision
 except ImportError:
-    dvision = NoSuchModule("dvision")
+    dvision = NoSuchModule("dvision")  # type: ignore
 
 try:
     import h5py
 except ImportError:
-    h5py = NoSuchModule("h5py")
+    h5py = NoSuchModule("h5py")  # type: ignore
 
 try:
     import pyklb
 except ImportError:
-    pyklb = NoSuchModule("pyklb")
+    pyklb = NoSuchModule("pyklb")  # type: ignore
 
 try:
     import tensorflow
 except ImportError:
-    tensorflow = NoSuchModule("tensorflow")
+    tensorflow = NoSuchModule("tensorflow")  # type: ignore
 
 try:
     import torch
 except ImportError:
-    torch = NoSuchModule("torch")
+    torch = NoSuchModule("torch")  # type: ignore
 
 try:
     import tensorboardX
 except ImportError:
-    tensorboardX = NoSuchModule("tensorboardX")
+    tensorboardX = NoSuchModule("tensorboardX")  # type: ignore
 
 try:
     import malis
 except ImportError:
-    malis = NoSuchModule("malis")
+    malis = NoSuchModule("malis")  # type: ignore
 
 try:
     import augment
 except ImportError:
-    augment = NoSuchModule("augment")
+    augment = NoSuchModule("augment")  # type: ignore
 
 ZarrFile: Optional[Any] = None
 try:
@@ -65,30 +65,30 @@ try:
 
     from .zarr_file import ZarrFile
 except ImportError:
-    zarr = NoSuchModule("zarr")
+    zarr = NoSuchModule("zarr")  # type: ignore
     ZarrFile = None
 
 try:
     import daisy
 except ImportError:
-    daisy = NoSuchModule("daisy")
+    daisy = NoSuchModule("daisy")  # type: ignore
 
 try:
     import jax
 except ImportError:
-    jax = NoSuchModule("jax")
+    jax = NoSuchModule("jax")  # type: ignore
 
 try:
     import jax.numpy as jnp
 except ImportError:
-    jnp = NoSuchModule("jnp")
+    jnp = NoSuchModule("jnp")  # type: ignore
 
 try:
     import haiku
 except ImportError:
-    haiku = NoSuchModule("haiku")
+    haiku = NoSuchModule("haiku")  # type: ignore
 
 try:
     import optax
 except ImportError:
-    optax = NoSuchModule("optax")
+    optax = NoSuchModule("optax")  # type: ignore
